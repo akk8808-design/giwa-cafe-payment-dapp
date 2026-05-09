@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="ko"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;GIWA Cafe Payment DApp&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: Arial, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #f6f7fb;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 40px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.container {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>max-width: 700px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 auto;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 8px 24px rgba(0,0,0,0.08);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>h1 {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #2563eb;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 6px 6px 6px 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:hover {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #1d4ed8;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.box {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #f3f4f6;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>word-break: break-all;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.label {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#status {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #111827;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid #d1d5db;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;GIWA Cafe Payment DApp&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p&gt;GIWA Sepolia Testnet에서 커피 결제를 테스트하는 간단한 DApp&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;strong&gt;Contract Address&lt;/strong&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="contractAddress"&gt;0x63571b3C0e077e61CB64125e2F7A321a3938F4f6&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="connectButton"&gt;지갑 연결&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="loadInfoButton"&gt;가게 정보 조회&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="balanceButton"&gt;컨트랙트 잔액 조회&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="payButton"&gt;커피 결제 (0.001 ETH)&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label class="label"&gt;새 커피 가격 설정 (owner만 가능, wei 단위)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="text" id="newPriceInput" placeholder="예: 1000000000000000" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="setPriceButton"&gt;가격 변경&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="withdrawButton"&gt;출금 (owner만 가능)&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;strong&gt;연결된 지갑&lt;/strong&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="walletAddress"&gt;아직 연결 안 됨&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;strong&gt;가게 이름&lt;/strong&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="shopName"&gt;-&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;strong&gt;커피 가격&lt;/strong&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="coffeePrice"&gt;-&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;strong&gt;컨트랙트 잔액&lt;/strong&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="contractBalance"&gt;-&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="status"&gt;대기 중...&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const contractAddress = "0x63571b3C0e077e61CB64125e2F7A321a3938F4f6";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const abi = [</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "payForCoffee",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "payable",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "uint256",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "newPrice",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "uint256"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "setCoffeePrice",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "nonpayable",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "nonpayable",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "constructor"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"anonymous": false,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"indexed": true,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "address",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "from",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "address"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"indexed": false,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "uint256",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "amount",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "uint256"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"indexed": false,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "string",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "menu",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "string"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "PaymentReceived",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "event"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "withdraw",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "nonpayable",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "coffeePrice",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "uint256",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "uint256"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "view",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "getBalance",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "uint256",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "uint256"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "view",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "owner",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "address",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "address"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "view",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"inputs": [],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"name": "shopName",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"outputs": [</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"internalType": "string",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"name": "",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"type": "string"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"stateMutability": "view",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"type": "function"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let provider;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let signer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let contract;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const statusEl = document.getElementById("status");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const walletEl = document.getElementById("walletAddress");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const shopNameEl = document.getElementById("shopName");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const coffeePriceEl = document.getElementById("coffeePrice");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const contractBalanceEl = document.getElementById("contractBalance");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function connectWallet() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!window.ethereum) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "MetaMask가 설치되어 있지 않습니다.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>provider = new ethers.providers.Web3Provider(window.ethereum);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await provider.send("eth_requestAccounts", []);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>signer = provider.getSigner();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const userAddress = await signer.getAddress();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>contract = new ethers.Contract(contractAddress, abi, signer);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>walletEl.innerText = userAddress;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "지갑 연결 완료";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "지갑 연결 실패";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function loadInfo() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!contract) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "먼저 지갑을 연결하세요.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const shopName = await contract.shopName();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const coffeePrice = await contract.coffeePrice();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>shopNameEl.innerText = shopName;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>coffeePriceEl.innerText = ethers.utils.formatEther(coffeePrice) + " ETH";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "가게 정보 조회 완료";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "가게 정보 조회 실패";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function getContractBalance() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!contract) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "먼저 지갑을 연결하세요.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const balance = await contract.getBalance();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>contractBalanceEl.innerText = ethers.utils.formatEther(balance) + " ETH";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "컨트랙트 잔액 조회 완료";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "잔액 조회 실패";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function payForCoffee() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!contract) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "먼저 지갑을 연결하세요.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "결제 요청 중...";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const tx = await contract.payForCoffee({</p>
+<p class="p1"><span class="Apple-converted-space">          </span>value: ethers.utils.parseEther("0.001")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>await tx.wait();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "커피 결제 완료";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await getContractBalance();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "결제 실패";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function setCoffeePrice() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!contract) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "먼저 지갑을 연결하세요.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const newPrice = document.getElementById("newPriceInput").value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!newPrice) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "새 가격을 입력하세요.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "가격 변경 요청 중...";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const tx = await contract.setCoffeePrice(newPrice);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await tx.wait();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "가격 변경 완료";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await loadInfo();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "가격 변경 실패";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function withdraw() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!contract) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>statusEl.innerText = "먼저 지갑을 연결하세요.";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "출금 요청 중...";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const tx = await contract.withdraw();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await tx.wait();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "출금 완료";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await getContractBalance();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.innerText = "출금 실패";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("connectButton").addEventListener("click", connectWallet);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("loadInfoButton").addEventListener("click", loadInfo);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("balanceButton").addEventListener("click", getContractBalance);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("payButton").addEventListener("click", payForCoffee);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("setPriceButton").addEventListener("click", setCoffeePrice);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("withdrawButton").addEventListener("click", withdraw);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>

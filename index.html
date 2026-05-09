@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GIWA Cafe Payment DApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    h1 { margin-top: 0; }
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 6px 6px 6px 0;
+    }
+    button:hover { background: #1d4ed8; }
+    .box {
+      background: #f3f4f6;
+      padding: 14px;
+      border-radius: 10px;
+      margin-top: 14px;
+      word-break: break-all;
+    }
+    .label {
+      font-weight: bold;
+      margin-top: 16px;
+      display: block;
+    }
+    #status {
+      margin-top: 16px;
+      color: #111827;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GIWA Cafe Payment DApp</h1>
+    <p>GIWA Sepolia Testnet에서 커피 결제를 테스트하는 간단한 DApp</p>
+
+    <div class="box">
+      <div><strong>Contract Address</strong></div>
+      <div id="contractAddress">0x63571b3C0e077e61CB64125e2F7A321a3938F4f6</div>
+    </div>
+
+    <button id="connectButton">지갑 연결</button>
+    <button id="loadInfoButton">가게 정보 조회</button>
+    <button id="balanceButton">컨트랙트 잔액 조회</button>
+    <button id="payButton">커피 결제 (0.001 ETH)</button>
+
+    <label class="label">새 커피 가격 설정 (owner만 가능, wei 단위)</label>
+    <input type="text" id="newPriceInput" placeholder="예: 1000000000000000" />
+    <button id="setPriceButton">가격 변경</button>
+    <button id="withdrawButton">출금 (owner만 가능)</button>
+
+    <div class="box">
+      <div><strong>연결된 지갑</strong></div>
+      <div id="walletAddress">아직 연결 안 됨</div>
+    </div>
+
+    <div class="box">
+      <div><strong>가게 이름</strong></div>
+      <div id="shopName">-</div>
+    </div>
+
+    <div class="box">
+      <div><strong>커피 가격</strong></div>
+      <div id="coffeePrice">-</div>
+    </div>
+
+    <div class="box">
+      <div><strong>컨트랙트 잔액</strong></div>
+      <div id="contractBalance">-</div>
+    </div>
+
+    <div id="status">대기 중...</div>
+  </div>
+
+  <script>
+    const contractAddress = "0x63571b3C0e077e61CB64125e2F7A321a3938F4f6";
+
+    const abi = [
+      { "inputs": [], "name": "payForCoffee", "outputs": [], "stateMutability": "payable", "type": "function" },
+      { "inputs": [{ "internalType": "uint256", "name": "newPrice", "type": "uint256" }], "name": "setCoffeePrice", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [], "name": "withdraw", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [], "name": "coffeePrice", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+      { "inputs": [], "name": "getBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+      { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+      { "inputs": [], "name": "shopName", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }
+    ];
+
+    let provider;
+    let signer;
+    let contract;
+
+    const statusEl = document.getElementById("status");
+    const walletEl = document.getElementById("walletAddress");
+    const shopNameEl = document.getElementById("shopName");
+    const coffeePriceEl = document.getElementById("coffeePrice");
+    const contractBalanceEl = document.getElementById("contractBalance");
+
+    const GIWA_DEC = "91342";
+    const GIWA_HEX = "0x164ce";
+
+    async function ensureGiwaNetwork() {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      let network = await provider.getNetwork();
+
+      if (String(network.chainId) === GIWA_DEC) return true;
+
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: GIWA_HEX }]
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: GIWA_HEX,
+                chainName: "GIWA Sepolia Testnet",
+                nativeCurrency: {
+                  name: "ETH",
+                  symbol: "ETH",
+                  decimals: 18
+                },
+                rpcUrls: ["https://sepolia-rpc.giwa.io"],
+                blockExplorerUrls: ["https://sepolia-explorer.giwa.io"]
+              }]
+            });
+          } catch (addError) {
+            throw addError;
+          }
+        } else {
+          throw switchError;
+        }
+      }
+
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      network = await provider.getNetwork();
+      return String(network.chainId) === GIWA_DEC;
+    }
+
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          statusEl.innerText = "MetaMask가 설치되어 있지 않습니다.";
+          return;
+        }
+
+        await provider?.send?.("eth_requestAccounts", []).catch(() => {});
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+
+        const ok = await ensureGiwaNetwork();
+        if (!ok) {
+          statusEl.innerText = "GIWA Sepolia Testnet(91342)으로 바꿔주세요.";
+          return;
+        }
+
+        signer = provider.getSigner();
+        const userAddress = await signer.getAddress();
+        contract = new ethers.Contract(contractAddress, abi, signer);
+
+        walletEl.innerText = userAddress;
+        statusEl.innerText = "지갑 연결 완료";
+      } catch (error) {
+        console.error(error);
+        statusEl.innerText = "지갑 연결 실패: " + (error?.message || "unknown error");
+      }
+    }
+
+    async function loadInfo() {
+      try {
+        if (!contract) {
+          statusEl.innerText = "먼저 지갑을 연결하세요.";
+          return;
+        }
+
+        const shopName = await contract.shopName();
+        const coffeePrice = await contract.coffeePrice();
+
+        shopNameEl.innerText = shopName;
+        coffeePriceEl.innerText = ethers.utils.formatEther(coffeePrice) + " ETH";
+        statusEl.innerText = "가게 정보 조회 완료";
+      } catch (error) {
+        console.error(error);
+        statusEl.innerText = "가게 정보 조회 실패: " + (error?.message || "unknown error");
+      }
+    }
+
+    async function getContractBalance() {
+      try {
+        if (!contract) {
+          statusEl.innerText = "먼저 지갑을 연결하세요.";
+          return;
+        }
+
+        const balance = await contract.getBalance();
+        contractBalanceEl.innerText = ethers.utils.formatEther(balance) + " ETH";
+        statusEl.innerText = "컨트랙트 잔액 조회 완료";
+      } catch (error) {
+        console.error(error);
+        statusEl.innerText = "잔액 조회 실패: " + (error?.message || "unknown error");
+      }
+    }
+
+    async function payForCoffee() {
+      try {
+        if (!contract) {
+          statusEl.innerText = "먼저 지갑을 연결하세요.";
+          return;
+        }
+
+        statusEl.innerText = "결제 요청 중...";
+        const tx = await contract.payForCoffee({
+          value: ethers.utils.parseEther("0.001")
+        });
+
+        await tx.wait();
+        statusEl.innerText = "커피 결제 완료";
+        await getContractBalance();
+      } catch (error) {
+        console.error(error);
+        statusEl.innerText = "결제 실패: " + (error?.message || "unknown error");
+      }
+    }
+
+    async function setCoffeePrice() {
+      try {
+        if (!contract) {
+          statusEl.innerText = "먼저 지갑을 연결하세요.";
+          return;
+        }
+
+        const newPrice = document.getElementById("newPriceInput").value.trim();
+        if (!newPrice) {
+          statusEl.innerText = "새 가격을 입력하세요.";
+          return;
+        }
+
+        statusEl.innerText = "가격 변경 요청 중...";
+        const tx = await contract.setCoffeePrice(newPrice);
+        await tx.wait();
+
+        statusEl.innerText = "가격 변경 완료";
+        await loadInfo();
+      } catch (error) {
+        console.error(error);
+        statusEl.innerText = "가격 변경 실패: " + (error?.message || "unknown error");
+      }
+    }
+
+    async function withdraw() {
+      try {
+        if (!contract) {
+          statusEl.innerText = "먼저 지갑을 연결하세요.";
+          return;
+        }
+
+        statusEl.innerText = "출금 요청 중...";
+        const tx = await contract.withdraw();
+        await tx.wait();
+
+        statusEl.innerText = "출금 완료";
+        await getContractBalance();
+      } catch (error) {
+        console.error(error);
+        statusEl.innerText = "출금 실패: " + (error?.message || "unknown error");
+      }
+    }
+
+    document.getElementById("connectButton").addEventListener("click", connectWallet);
+    document.getElementById("loadInfoButton").addEventListener("click", loadInfo);
+    document.getElementById("balanceButton").addEventListener("click", getContractBalance);
+    document.getElementById("payButton").addEventListener("click", payForCoffee);
+    document.getElementById("setPriceButton").addEventListener("click", setCoffeePrice);
+    document.getElementById("withdrawButton").addEventListener("click", withdraw);
+  </script>
+</body>
+</html>
